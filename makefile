@@ -7,7 +7,7 @@
 # Optimize           Faster
 # Keyboard Layout    US English
 #
-# 3/06/2019 1:37 PM
+# 3/06/2019 2:01 PM
 #******************************************************************************
 SHELL            := cmd.exe
 export SHELL
@@ -21,7 +21,7 @@ LIBS_SHARED_BASE := C:\Users\garet\Documents\Arduino\libraries
 LIBS_SHARED      := 
 
 LIBS_LOCAL_BASE  := lib
-LIBS_LOCAL       := Artnet OctoWS2811 Ethernet SPI EEPROM 
+LIBS_LOCAL       := Artnet OctoWS2811 Ethernet SPI EEPROM Entropy 
 
 CORE_BASE        := C:\PROGRA~2\Arduino\hardware\teensy\avr\cores\teensy3
 GCC_BASE         := C:\PROGRA~2\Arduino\hardware\tools\arm

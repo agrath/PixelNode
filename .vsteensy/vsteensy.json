@@ -19,7 +19,8 @@
         "OctoWS2811",
         "Ethernet",
         "SPI",
-        "EEPROM"
+        "EEPROM",
+        "Entropy"
       ],
       "board": {
         "name": "Teensy 3.2 / 3.1",

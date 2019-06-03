@@ -9,9 +9,12 @@ This example may be copied under the terms of the MIT license, see the LICENSE f
 #include <EthernetUdp.h>
 #include <SPI.h>
 #include <OctoWS2811.h>
+#include <eeprom.h>
+#include <Entropy.h>
 
 void onDmxFrame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t *data, IPAddress remoteIP);
 void initTest();
+void getMacAddress(byte mac[]);
 
 // OctoWS2811 settings
 const int ledsPerStrip = 240; // change for your setup
@@ -35,17 +38,23 @@ int previousDataLength = 0;
 
 // Change ip and mac address for your setup
 //todo: change to dhcp
-//todo: randomzie mac and store in eeprom
+//todo: add bonjour
 byte ip[] = {192, 168, 2, 2};
 byte broadcastMask[] = {192, 168, 2, 255};
-byte mac[] = {0x04, 0xE9, 0xE5, 0x00, 0x69, 0xEC};
+
+//mac is filled by getMacAddress() and persisted to EEPROM
+byte mac[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 void setup()
 {
+  //Serial.begin(115200);
+  Entropy.Initialize(); 
   //todo: begin opc listener
   //todo: config for mapping? 8ch parallel; need to know strip length and synch config and expected artnet universes
-
-  //Serial.begin(115200);
+  
+  //generate and store or fetch mac from eeprom
+  getMacAddress(mac);
+  
   artnet.setBroadcast(broadcastMask);
   artnet.begin(mac, ip);
   leds.begin();
@@ -112,4 +121,32 @@ void initTest()
   for (int i = 0; i < numLeds; i++)
     leds.setPixel(i, 0, 0, 0);
   leds.show();
+}
+
+void getMacAddress(byte mac[])
+{
+  //header set to OUI from GHEO Sa
+  mac[0] = 0x90;
+  mac[1] = 0xA2;
+  mac[2] = 0xDA;
+  //if we have generated and stored mac already (EEPROM begins with #)
+  if (EEPROM.read(1) == '#')
+  {
+    for (int i = 3; i < 6; i++)
+    {
+      mac[i] = EEPROM.read(i-1);
+    }
+  }
+  else
+  {
+    //generate a random one
+    for (int i = 3; i < 6; i++)
+    {
+      uint8_t b = Entropy.random(WDT_RETURN_BYTE);
+      mac[i] = (byte)b;
+      EEPROM.write(i-1, mac[i]);
+    }
+    //write config marker
+    EEPROM.write(1, '#');
+  }
 }
